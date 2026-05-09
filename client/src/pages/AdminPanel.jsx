@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend, LineChart, Line } from 'recharts';
-import { DollarSign, TrendingUp, Users, Clock, Activity, Cpu, ShieldCheck, Database } from 'lucide-react';
+import { DollarSign, TrendingUp, Users, Clock, Activity } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const AdminPanel = () => {
@@ -66,7 +66,7 @@ const AdminPanel = () => {
         <h1 className="text-4xl font-black tracking-wider flex items-center gap-3">
           Admin <span className="text-gradient">Command Center</span>
           <span className="px-3 py-1 bg-green-500/10 text-green-400 border border-green-500/30 rounded-full text-xs flex items-center gap-2">
-            <ShieldCheck size={14} /> SECURE
+            SECURE
           </span>
         </h1>
         <p className="text-gray-400 mt-2 text-lg">Enterprise parking management and AI monitoring</p>
@@ -75,7 +75,7 @@ const AdminPanel = () => {
       {/* AI Health Monitoring */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 relative z-10">
         <div className="glass-panel p-4 rounded-2xl bg-black/40 border border-gray-800 flex items-center gap-4">
-          <Cpu className="text-[var(--color-neon-blue)] animate-pulse" size={28} />
+          <Activity className="text-[var(--color-neon-blue)] animate-pulse" size={28} />
           <div>
             <p className="text-xs text-gray-500 uppercase tracking-widest">AI Engine</p>
             <p className="text-lg font-bold text-white">OPTIMAL</p>
@@ -89,14 +89,14 @@ const AdminPanel = () => {
           </div>
         </div>
         <div className="glass-panel p-4 rounded-2xl bg-black/40 border border-gray-800 flex items-center gap-4">
-          <Database className="text-purple-400" size={28} />
+          <Activity className="text-purple-400" size={28} />
           <div>
             <p className="text-xs text-gray-500 uppercase tracking-widest">Sensor Nodes</p>
             <p className="text-lg font-bold text-white">25 / 25 <span className="text-xs text-green-500 ml-1">LIVE</span></p>
           </div>
         </div>
         <div className="glass-panel p-4 rounded-2xl bg-black/40 border border-gray-800 flex items-center gap-4">
-          <Car className="text-yellow-400" size={28} />
+          <Activity className="text-yellow-400" size={28} />
           <div>
             <p className="text-xs text-gray-500 uppercase tracking-widest">Active Vehicles</p>
             <p className="text-lg font-bold text-white">142/hr</p>
@@ -173,7 +173,7 @@ const AdminPanel = () => {
 
         <div className="glass-panel p-6 rounded-3xl border border-gray-800/50">
           <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-            <Car className="text-purple-400" /> Slot Usage by Zone Type
+            <Activity className="text-purple-400" /> Slot Usage by Zone Type
           </h3>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
@@ -196,7 +196,7 @@ const AdminPanel = () => {
 
       <div className="glass-panel p-6 rounded-3xl border border-gray-800/50 relative z-10">
         <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-          <Cpu className="text-[var(--color-neon-green)]" /> Bayesian AI Model Accuracy
+          <Activity className="text-[var(--color-neon-green)]" /> Bayesian AI Model Accuracy
         </h3>
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
