@@ -163,7 +163,7 @@ const AdminPanel = () => {
                   contentStyle={{ backgroundColor: 'rgba(10, 10, 15, 0.95)', border: '1px solid rgba(0,243,255,0.2)', borderRadius: '12px', backdropFilter: 'blur(10px)' }}
                   itemStyle={{ color: '#fff', fontWeight: 'bold' }}
                 />
-                <Legend iconType="circle" wrapperStyle={{ paddingTop: '20px' }} />
+                <Legend />
                 <Area type="monotone" dataKey="occupancy" stroke="#00f3ff" strokeWidth={3} fillOpacity={1} fill="url(#colorOccupancy)" name="Actual Occupancy %" />
                 <Area type="monotone" dataKey="prediction" stroke="#39ff14" strokeWidth={3} fillOpacity={1} fill="url(#colorPrediction)" name="AI Prediction %" />
               </AreaChart>
@@ -185,7 +185,7 @@ const AdminPanel = () => {
                   contentStyle={{ backgroundColor: 'rgba(10, 10, 15, 0.95)', border: '1px solid rgba(168,85,247,0.3)', borderRadius: '12px', backdropFilter: 'blur(10px)' }}
                   cursor={{ fill: 'rgba(255,255,255,0.05)' }}
                 />
-                <Legend iconType="circle" wrapperStyle={{ paddingTop: '20px' }} />
+                <Legend />
                 <Bar dataKey="used" fill="#a855f7" name="Currently Used" radius={[6, 6, 0, 0]} barSize={40} />
                 <Bar dataKey="total" fill="rgba(255,255,255,0.1)" name="Total Capacity" radius={[6, 6, 0, 0]} barSize={40} />
               </BarChart>
@@ -207,7 +207,7 @@ const AdminPanel = () => {
               <Tooltip 
                 contentStyle={{ backgroundColor: 'rgba(10, 10, 15, 0.95)', border: '1px solid rgba(57,255,20,0.3)', borderRadius: '12px', backdropFilter: 'blur(10px)' }}
               />
-              <Legend iconType="circle" />
+              <Legend />
               <Line type="monotone" dataKey="accuracy" stroke="#39ff14" strokeWidth={4} name="Prediction Accuracy %" dot={{ fill: '#39ff14', r: 6, strokeWidth: 2, stroke: '#000' }} activeDot={{ r: 8, strokeWidth: 0 }} />
             </LineChart>
           </ResponsiveContainer>
