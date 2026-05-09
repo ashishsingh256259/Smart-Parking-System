@@ -19,7 +19,8 @@ const Dashboard = () => {
 
   const fetchSlots = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/slots');
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const res = await axios.get(`${API_URL}/api/slots`);
       const data = res.data;
       setSlots(data);
       
@@ -60,7 +61,8 @@ const Dashboard = () => {
     
     // Simulate booking/occupying
     try {
-      await axios.put(`http://localhost:5000/api/occupy-slot/${slot.slotId}`);
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      await axios.put(`${API_URL}/api/occupy-slot/${slot.slotId}`);
       fetchSlots(); // Refresh data
     } catch (error) {
       console.error('Error occupying slot', error);
@@ -68,7 +70,8 @@ const Dashboard = () => {
   };
 
   const seedSlots = async () => {
-    await axios.post('http://localhost:5000/api/seed-slots');
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    await axios.post(`${API_URL}/api/seed-slots`);
     fetchSlots();
   };
 
