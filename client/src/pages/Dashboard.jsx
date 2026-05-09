@@ -3,6 +3,8 @@ import axios from 'axios';
 import { motion } from 'framer-motion';
 import { Activity, Car, CheckCircle, Clock, Percent, AlertCircle } from 'lucide-react';
 import InteractiveMap from '../components/InteractiveMap';
+import toast, { Toaster } from 'react-hot-toast';
+import { CloudSun, Sun } from 'lucide-react';
 
 const Dashboard = () => {
   const [slots, setSlots] = useState([]);
@@ -14,8 +16,10 @@ const Dashboard = () => {
     reserved: 0,
     occupancyRate: 0,
     avgConfidence: 0,
+    avgConfidence: 0,
     waitTime: '2 mins'
   });
+  const [time, setTime] = useState(new Date());
 
   const fetchSlots = async () => {
     try {
@@ -53,26 +57,41 @@ const Dashboard = () => {
     fetchSlots();
     // In a real app, use WebSockets. Here we poll every 5s for simulation
     const interval = setInterval(fetchSlots, 5000);
-    return () => clearInterval(interval);
+    const clockInterval = setInterval(() => setTime(new Date()), 1000);
+    return () => {
+      clearInterval(interval);
+      clearInterval(clockInterval);
+    };
   }, []);
 
   const handleSlotClick = async (slot) => {
-    if (slot.status !== 'available') return;
+    if (slot.status === 'reserved') {
+      toast.error(`Slot ${slot.slotId} is reserved for VIP/Disabled parking.`);
+      return;
+    }
     
-    // Simulate booking/occupying
     try {
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-      await axios.put(`${API_URL}/api/occupy-slot/${slot.slotId}`);
+      if (slot.status === 'available') {
+        toast.success(`Navigating to Slot ${slot.slotId}...`);
+        await axios.put(`${API_URL}/api/occupy-slot/${slot.slotId}`);
+      } else if (slot.status === 'occupied') {
+        toast('Vehicle exited. Freeing slot...', { icon: '👋' });
+        await axios.put(`${API_URL}/api/free-slot/${slot.slotId}`);
+      }
       fetchSlots(); // Refresh data
     } catch (error) {
-      console.error('Error occupying slot', error);
+      console.error('Error updating slot', error);
+      toast.error('Connection error. Try again.');
     }
   };
 
   const seedSlots = async () => {
+    toast.loading('Initializing AI Grid...', { id: 'seed' });
     const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
     await axios.post(`${API_URL}/api/seed-slots`);
     fetchSlots();
+    toast.success('AI Grid Initialized!', { id: 'seed' });
   };
 
   if (loading && slots.length === 0) {
@@ -85,6 +104,9 @@ const Dashboard = () => {
 
   return (
     <div className="pt-24 px-6 md:px-12 pb-12 max-w-7xl mx-auto">
+      <Toaster position="top-right" toastOptions={{
+        style: { background: 'rgba(20, 20, 30, 0.9)', color: '#fff', border: '1px solid rgba(0, 243, 255, 0.3)' }
+      }} />
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold tracking-wider">Live <span className="text-gradient">Dashboard</span></h1>
@@ -147,6 +169,23 @@ const Dashboard = () => {
         </div>
         
         <div className="flex flex-col gap-6">
+          {/* Smart City Weather & Clock Widget */}
+          <div className="glass-panel p-6 rounded-2xl bg-gradient-to-br from-[rgba(20,20,30,0.8)] to-[rgba(0,243,255,0.05)]">
+            <div className="flex justify-between items-center">
+              <div>
+                <p className="text-gray-400 text-sm font-medium">{time.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
+                <h2 className="text-3xl font-bold mt-1 tracking-wider text-white">
+                  {time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                </h2>
+              </div>
+              <div className="text-right">
+                <Sun size={32} className="text-yellow-400 ml-auto mb-1 animate-pulse" />
+                <p className="text-lg font-bold">24°C</p>
+                <p className="text-xs text-gray-400">Clear Sky</p>
+              </div>
+            </div>
+          </div>
+
           <div className="glass-panel p-6 rounded-2xl">
             <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
               <Activity size={20} className="text-[var(--color-neon-blue)]" />

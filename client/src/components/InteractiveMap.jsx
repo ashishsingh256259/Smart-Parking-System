@@ -98,8 +98,9 @@ const InteractiveMap = ({ slots, onSlotClick }) => {
                 borderColor = "border-[var(--color-neon-green)]/50";
                 shadow = "hover:shadow-[0_0_15px_rgba(57,255,20,0.4)]";
               } else if (slot.status === 'occupied') {
-                bgColor = "bg-red-500/10";
-                borderColor = "border-red-500/50";
+                bgColor = "bg-red-500/10 hover:bg-red-500/30";
+                borderColor = "border-red-500/50 hover:border-red-400";
+                shadow = "hover:shadow-[0_0_15px_rgba(239,68,68,0.4)]";
               } else if (slot.status === 'reserved') {
                 bgColor = "bg-yellow-400/10";
                 borderColor = "border-yellow-400/50";
@@ -118,8 +119,8 @@ const InteractiveMap = ({ slots, onSlotClick }) => {
             return (
               <motion.div
                 key={`${x}-${y}`}
-                whileHover={slot?.status === 'available' ? { scale: 1.05 } : {}}
-                whileTap={slot?.status === 'available' ? { scale: 0.95 } : {}}
+                whileHover={slot && slot.status !== 'reserved' ? { scale: 1.05 } : {}}
+                whileTap={slot && slot.status !== 'reserved' ? { scale: 0.95 } : {}}
                 onClick={() => slot && handleSlotClick(slot)}
                 className={`
                   aspect-square rounded-lg border-2 flex flex-col items-center justify-center
