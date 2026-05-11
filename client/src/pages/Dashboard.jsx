@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Activity, Car, CheckCircle, Clock, Percent, AlertCircle, Zap, Cpu, Search, TrendingUp, Play, Pause, Lightbulb } from 'lucide-react';
+import { Activity, Car, CheckCircle, Clock, Percent, AlertCircle, Zap, Cpu, Search, TrendingUp, Play, Pause, Lightbulb, Shield, Thermometer, Wind, Scale } from 'lucide-react';
 import InteractiveMap from '../components/InteractiveMap';
 import toast, { Toaster } from 'react-hot-toast';
 import { CloudSun, Sun } from 'lucide-react';
@@ -11,6 +11,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [logs, setLogs] = useState([]);
   const [autoNavigateTarget, setAutoNavigateTarget] = useState(null);
+  const [optimizationMode, setOptimizationMode] = useState('balanced');
   const [isSimulationActive, setIsSimulationActive] = useState(false);
   const [insights, setInsights] = useState([
     { id: 1, text: "AI predicts 85% occupancy by 14:00.", type: "info" },
@@ -192,11 +193,26 @@ const Dashboard = () => {
     
     // AI Logic: Sort by prediction percentage (descending), then by distance to entry gate (0,0)
     const bestSlot = availableSlots.sort((a, b) => {
-      if (b.predictionPercentage !== a.predictionPercentage) {
-        return b.predictionPercentage - a.predictionPercentage;
-      }
+      let scoreA = a.predictionPercentage;
+      let scoreB = b.predictionPercentage;
+      
       const distA = Math.abs(a.x) + Math.abs(a.y);
       const distB = Math.abs(b.x) + Math.abs(b.y);
+
+      if (optimizationMode === 'quick') {
+         scoreA -= distA * 15;
+         scoreB -= distB * 15;
+      } else if (optimizationMode === 'thermal') {
+         scoreA += a.y >= 3 ? 60 : 0; // deeper slots have more shade
+         scoreB += b.y >= 3 ? 60 : 0;
+      } else if (optimizationMode === 'sentry') {
+         scoreA += a.x <= 1 ? 60 : 0; // slots near entrance have high camera coverage
+         scoreB += b.x <= 1 ? 60 : 0;
+      }
+
+      if (scoreB !== scoreA) {
+        return scoreB - scoreA;
+      }
       return distA - distB;
     })[0];
 
@@ -339,6 +355,28 @@ const Dashboard = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 relative z-10">
         <div className="lg:col-span-2 flex flex-col">
+          {slots.length > 0 && (
+            <div className="mb-4 flex flex-wrap gap-3">
+              {[
+                { id: 'balanced', label: 'Balanced AI', icon: <Scale size={16} /> },
+                { id: 'thermal', label: 'Thermal Comfort (Shade)', icon: <Thermometer size={16} /> },
+                { id: 'sentry', label: 'Sentry Mode (Security)', icon: <Shield size={16} /> },
+                { id: 'quick', label: 'Quick Getaway', icon: <Wind size={16} /> }
+              ].map(mode => (
+                <button 
+                  key={mode.id} 
+                  onClick={() => {
+                    setOptimizationMode(mode.id);
+                    toast(`AI re-calibrated for ${mode.label}`, { icon: '🤖' });
+                  }}
+                  className={`px-4 py-2 rounded-xl border text-sm font-bold flex items-center gap-2 transition-all ${optimizationMode === mode.id ? 'bg-[var(--color-neon-blue)]/20 border-[var(--color-neon-blue)] text-[var(--color-neon-blue)] shadow-[0_0_15px_rgba(0,243,255,0.2)]' : 'bg-black/40 border-gray-800 text-gray-400 hover:border-gray-600 hover:text-gray-300'}`}
+                >
+                  {mode.icon}
+                  {mode.label}
+                </button>
+              ))}
+            </div>
+          )}
           {slots.length > 0 ? (
             <InteractiveMap slots={slots} onSlotClick={handleSlotClick} autoNavigateTarget={autoNavigateTarget} />
           ) : (
