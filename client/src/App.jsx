@@ -5,6 +5,7 @@ import Navbar from './components/Navbar';
 import LandingPage from './pages/LandingPage';
 import Dashboard from './pages/Dashboard';
 import AdminPanel from './pages/AdminPanel';
+import ArchitectureShowcase from './pages/ArchitectureShowcase';
 
 function App() {
   const location = useLocation();
@@ -18,6 +19,7 @@ function App() {
             <Route path="/" element={<PageTransition><LandingPage /></PageTransition>} />
             <Route path="/dashboard" element={<PageTransition><Dashboard /></PageTransition>} />
             <Route path="/admin" element={<PageTransition><AdminPanel /></PageTransition>} />
+            <Route path="/architecture" element={<PageTransition><ArchitectureShowcase /></PageTransition>} />
           </Routes>
         </AnimatePresence>
       </div>

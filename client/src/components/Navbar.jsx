@@ -38,7 +38,14 @@ const Navbar = () => {
           className={`flex items-center gap-1 text-sm font-medium transition-colors hover:text-[var(--color-neon-blue)] ${isActive('/admin') ? 'text-[var(--color-neon-blue)]' : 'text-gray-300'}`}
         >
           <BarChart3 size={16} />
-          Admin
+          Command Center
+        </Link>
+        <Link 
+          to="/architecture" 
+          className={`flex items-center gap-1 text-sm font-medium transition-colors hover:text-[var(--color-neon-blue)] ${isActive('/architecture') ? 'text-[var(--color-neon-blue)]' : 'text-gray-300'}`}
+        >
+          <Car size={16} />
+          Architecture
         </Link>
       </div>
     </nav>

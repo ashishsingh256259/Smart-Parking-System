@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend, LineChart, Line } from 'recharts';
-import { DollarSign, TrendingUp, Users, Clock, Activity } from 'lucide-react';
+import { Zap, TrendingUp, Users, Clock, Activity, AlertTriangle } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const AdminPanel = () => {
@@ -62,14 +62,16 @@ const AdminPanel = () => {
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-[var(--color-neon-green)] rounded-full mix-blend-screen filter blur-[150px] opacity-10"></div>
       </div>
 
-      <div className="mb-8 relative z-10">
-        <h1 className="text-4xl font-black tracking-wider flex items-center gap-3">
-          Admin <span className="text-gradient">Command Center</span>
-          <span className="px-3 py-1 bg-green-500/10 text-green-400 border border-green-500/30 rounded-full text-xs flex items-center gap-2">
-            SECURE
-          </span>
-        </h1>
-        <p className="text-gray-400 mt-2 text-lg">Enterprise parking management and AI monitoring</p>
+      <div className="mb-8 relative z-10 flex justify-between items-end">
+        <div>
+          <h1 className="text-4xl md:text-5xl font-black tracking-wider flex items-center gap-4">
+            AI <span className="text-gradient">COMMAND CENTER</span>
+            <span className="px-3 py-1 bg-green-500/10 text-green-400 border border-green-500/30 rounded-full text-xs flex items-center gap-2 tracking-widest shadow-[0_0_15px_rgba(34,197,94,0.2)]">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-ping"></div> LIVE
+            </span>
+          </h1>
+          <p className="text-gray-400 mt-2 text-lg tracking-wide">Enterprise smart mobility monitoring and predictive analytics</p>
+        </div>
       </div>
 
       {/* AI Health Monitoring */}
@@ -105,20 +107,22 @@ const AdminPanel = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 relative z-10">
-        <motion.div whileHover={{ y: -5 }} className="glass-panel p-6 rounded-3xl border-t-2 border-t-[var(--color-neon-blue)]">
-          <div className="p-4 bg-[rgba(0,243,255,0.1)] rounded-2xl text-[var(--color-neon-blue)] inline-block mb-4">
-            <DollarSign size={24} />
+        <motion.div whileHover={{ y: -5 }} className="glass-panel p-6 rounded-3xl border-t-2 border-t-[var(--color-neon-blue)] relative overflow-hidden">
+          <div className="absolute right-0 top-0 w-24 h-24 bg-[var(--color-neon-blue)]/10 rounded-bl-full"></div>
+          <div className="p-4 bg-[rgba(0,243,255,0.1)] rounded-2xl text-[var(--color-neon-blue)] inline-block mb-4 relative z-10">
+            <Zap size={24} />
           </div>
-          <p className="text-sm text-gray-400 uppercase tracking-wider">Simulated Revenue</p>
-          <p className="text-4xl font-black mt-1">${analytics?.revenueSimulation || 0}</p>
+          <p className="text-sm text-gray-400 uppercase tracking-wider relative z-10">Parking Efficiency</p>
+          <p className="text-4xl font-black mt-1 text-white relative z-10">94.2<span className="text-lg text-gray-500">/100</span></p>
         </motion.div>
         
-        <motion.div whileHover={{ y: -5 }} className="glass-panel p-6 rounded-3xl border-t-2 border-t-[var(--color-neon-green)]">
-          <div className="p-4 bg-[rgba(57,255,20,0.1)] rounded-2xl text-[var(--color-neon-green)] inline-block mb-4">
+        <motion.div whileHover={{ y: -5 }} className="glass-panel p-6 rounded-3xl border-t-2 border-t-[var(--color-neon-green)] relative overflow-hidden">
+          <div className="absolute right-0 top-0 w-24 h-24 bg-[var(--color-neon-green)]/10 rounded-bl-full"></div>
+          <div className="p-4 bg-[rgba(57,255,20,0.1)] rounded-2xl text-[var(--color-neon-green)] inline-block mb-4 relative z-10">
             <TrendingUp size={24} />
           </div>
-          <p className="text-sm text-gray-400 uppercase tracking-wider">Peak Usage Time</p>
-          <p className="text-4xl font-black mt-1">{analytics?.peakUsageTime || '14:00'}</p>
+          <p className="text-sm text-gray-400 uppercase tracking-wider relative z-10">Traffic Flow Status</p>
+          <p className="text-4xl font-black mt-1 text-[var(--color-neon-green)] relative z-10 animate-pulse">OPTIMAL</p>
         </motion.div>
         
         <motion.div whileHover={{ y: -5 }} className="glass-panel p-6 rounded-3xl border-t-2 border-t-purple-500">

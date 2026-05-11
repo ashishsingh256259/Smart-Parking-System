@@ -82,10 +82,15 @@ const InteractiveMap = ({ slots, onSlotClick, autoNavigateTarget }) => {
     return x % 2 !== 0 || (x === 0 && y === 0);
   };
 
+  const occupancyDensity = slots.length > 0 ? slots.filter(s => s.status !== 'available').length / slots.length : 0;
+  const heatmapColor = occupancyDensity > 0.8 ? 'rgba(239, 68, 68, 0.15)' : occupancyDensity > 0.5 ? 'rgba(250, 204, 21, 0.1)' : 'rgba(57, 255, 20, 0.05)';
+
   return (
     <div className="glass-panel p-6 rounded-3xl relative overflow-hidden flex flex-col h-full">
+      {/* Smart Heatmap Overlay */}
+      <div className="absolute inset-0 pointer-events-none transition-colors duration-1000 z-0 mix-blend-screen" style={{ backgroundColor: heatmapColor }}></div>
       {/* Background Holographic Effect */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[rgba(0,243,255,0.03)] via-transparent to-transparent pointer-events-none"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[rgba(0,243,255,0.03)] via-transparent to-transparent pointer-events-none z-0"></div>
       
       <div className="flex justify-between items-start mb-6 z-10 relative">
         <div>
@@ -205,6 +210,16 @@ const InteractiveMap = ({ slots, onSlotClick, autoNavigateTarget }) => {
                         <Car size={32} className="text-red-400 drop-shadow-[0_0_10px_rgba(239,68,68,0.8)]" />
                       </motion.div>
                     )}
+                    
+                    {/* EV Charging Status */}
+                    {slot.status === 'occupied' && slot.type === 'ev' && (
+                      <div className="absolute top-1 right-1 flex items-center gap-1 bg-black/50 px-1 py-0.5 rounded border border-blue-400/30">
+                        <Zap size={10} className="text-blue-400 animate-pulse" />
+                        <div className="w-4 h-2 border border-blue-400 rounded-sm p-[1px] relative flex">
+                          <motion.div className="h-full bg-blue-400" animate={{ width: ['0%', '100%'] }} transition={{ duration: 2, repeat: Infinity, ease: 'linear' }} />
+                        </div>
+                      </div>
+                    )}
                   </>
                 );
               }
@@ -250,9 +265,10 @@ const InteractiveMap = ({ slots, onSlotClick, autoNavigateTarget }) => {
                       layoutId="navigationCar"
                       initial={{ scale: 0.5, opacity: 0 }}
                       animate={{ scale: 1.2, opacity: 1 }}
-                      className="absolute z-30 pointer-events-none"
+                      className="absolute z-30 pointer-events-none flex items-center justify-center"
                     >
-                      <Car size={40} className="text-[var(--color-neon-blue)] drop-shadow-[0_0_20px_rgba(0,243,255,1)]" />
+                      <Car size={40} className="text-[var(--color-neon-blue)] drop-shadow-[0_0_20px_rgba(0,243,255,1)] relative z-10" />
+                      <motion.div className="absolute inset-0 bg-[var(--color-neon-blue)] rounded-full blur-[15px] opacity-60 z-0" animate={{ scale: [1, 1.8, 1], opacity: [0.3, 0.8, 0.3] }} transition={{ duration: 1.5, repeat: Infinity }} />
                     </motion.div>
                   )}
 
@@ -260,7 +276,9 @@ const InteractiveMap = ({ slots, onSlotClick, autoNavigateTarget }) => {
                   {inPath && (
                     <motion.div 
                       layoutId="pathEffect"
-                      className="absolute inset-0 border-[3px] border-[var(--color-neon-blue)] rounded-xl filter blur-[4px] opacity-80 pointer-events-none" 
+                      className="absolute inset-0 border-[3px] border-[var(--color-neon-blue)] rounded-xl filter blur-[4px] opacity-80 pointer-events-none shadow-[inset_0_0_20px_rgba(0,243,255,0.5)]" 
+                      animate={{ opacity: [0.5, 1, 0.5] }}
+                      transition={{ duration: 2, repeat: Infinity }}
                     />
                   )}
                 </motion.div>

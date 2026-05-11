@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Activity, Car, CheckCircle, Clock, Percent, AlertCircle, Zap, Cpu, Search, TrendingUp } from 'lucide-react';
+import { Activity, Car, CheckCircle, Clock, Percent, AlertCircle, Zap, Cpu, Search, TrendingUp, Play, Pause, Lightbulb } from 'lucide-react';
 import InteractiveMap from '../components/InteractiveMap';
 import toast, { Toaster } from 'react-hot-toast';
 import { CloudSun, Sun } from 'lucide-react';
@@ -11,6 +11,11 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [logs, setLogs] = useState([]);
   const [autoNavigateTarget, setAutoNavigateTarget] = useState(null);
+  const [isSimulationActive, setIsSimulationActive] = useState(false);
+  const [insights, setInsights] = useState([
+    { id: 1, text: "AI predicts 85% occupancy by 14:00.", type: "info" },
+    { id: 2, text: "Routing efficiency up 12% today.", type: "success" }
+  ]);
   
   const [stats, setStats] = useState({
     total: 0,
@@ -125,7 +130,7 @@ const Dashboard = () => {
 
   // Dynamic Traffic Simulation
   useEffect(() => {
-    if (slots.length === 0) return;
+    if (slots.length === 0 || !isSimulationActive) return;
     const trafficInterval = setInterval(async () => {
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
       // Simulate random cars entering/leaving
@@ -135,6 +140,10 @@ const Dashboard = () => {
           const randomSlot = availableSlots[Math.floor(Math.random() * availableSlots.length)];
           setAutoNavigateTarget(randomSlot);
           addLog(`Vehicle entered Gate A. AI routing to ${randomSlot.slotId}`, 'info');
+          
+          if (availableSlots.length < 5) {
+            setInsights(prev => [{ id: Date.now(), text: "High congestion predicted in 5 mins. Recommend rerouting to overflow zone.", type: "warning" }, ...prev].slice(0,3));
+          }
         }
       } else if (Math.random() > 0.7) {
         const occupiedSlots = slots.filter(s => s.status === 'occupied');
@@ -245,21 +254,33 @@ const Dashboard = () => {
         <div>
           <h1 className="text-4xl font-extrabold tracking-wider flex items-center gap-3">
             Live <span className="text-gradient">Dashboard</span>
-            <span className="px-2 py-0.5 text-[10px] bg-red-500/20 text-red-400 border border-red-500/50 rounded flex items-center gap-1 animate-pulse"><div className="w-1.5 h-1.5 bg-red-500 rounded-full"></div> REC</span>
+            {isSimulationActive && (
+              <span className="px-2 py-0.5 text-[10px] bg-red-500/20 text-red-400 border border-red-500/50 rounded flex items-center gap-1 animate-pulse"><div className="w-1.5 h-1.5 bg-red-500 rounded-full"></div> LIVE SIM</span>
+            )}
           </h1>
           <p className="text-gray-400 mt-1">Real-time smart city parking simulation</p>
         </div>
         
         <div className="flex gap-4">
           {slots.length > 0 && (
-            <motion.button 
-              whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
-              onClick={findBestSlot} 
-              className="px-6 py-2.5 glass-panel text-white font-bold rounded-xl hover:bg-[rgba(57,255,20,0.1)] hover:border-[var(--color-neon-green)] transition-colors flex items-center gap-2 border-[var(--color-neon-green)]/30"
-            >
-              <Search size={18} className="text-[var(--color-neon-green)]" />
-              Find Best Slot
-            </motion.button>
+            <>
+              <motion.button 
+                whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+                onClick={() => setIsSimulationActive(!isSimulationActive)} 
+                className={`px-6 py-2.5 glass-panel text-white font-bold rounded-xl transition-colors flex items-center gap-2 border-gray-700 ${isSimulationActive ? 'bg-red-500/20 border-red-500/50 hover:bg-red-500/30' : 'hover:bg-white/10'}`}
+              >
+                {isSimulationActive ? <Pause size={18} className="text-red-400" /> : <Play size={18} className="text-gray-300" />}
+                {isSimulationActive ? 'Stop Simulation' : 'Start Simulation'}
+              </motion.button>
+              <motion.button 
+                whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+                onClick={findBestSlot} 
+                className="px-6 py-2.5 glass-panel text-white font-bold rounded-xl hover:bg-[rgba(57,255,20,0.1)] hover:border-[var(--color-neon-green)] transition-colors flex items-center gap-2 border-[var(--color-neon-green)]/30"
+              >
+                <Search size={18} className="text-[var(--color-neon-green)]" />
+                Find Best Slot
+              </motion.button>
+            </>
           )}
           {slots.length === 0 && (
             <motion.button 
@@ -366,6 +387,36 @@ const Dashboard = () => {
               <p className="text-xs text-gray-500 leading-relaxed">
                 {stats.occupancyRate > 80 ? "High congestion detected. Routing vehicles to alternate zones." : "Optimal traffic flow. Average fuel savings: 12%."}
               </p>
+            </div>
+          {/* AI Insights Panel */}
+          <div className="glass-panel p-6 rounded-3xl border-purple-500/20 bg-gradient-to-br from-[rgba(20,20,30,0.9)] to-purple-900/10">
+            <h3 className="text-lg font-bold mb-4 flex items-center gap-2 border-b border-gray-800 pb-3">
+              <Lightbulb size={20} className="text-purple-400" />
+              Intelligent AI Insights
+            </h3>
+            <div className="space-y-3">
+              <AnimatePresence>
+                {insights.map(insight => (
+                  <motion.div
+                    key={insight.id}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    className={`p-3 rounded-xl border flex items-start gap-3 backdrop-blur-md
+                      ${insight.type === 'warning' ? 'bg-yellow-500/10 border-yellow-500/30' : 
+                        insight.type === 'success' ? 'bg-[var(--color-neon-green)]/10 border-[var(--color-neon-green)]/30' :
+                        'bg-[var(--color-neon-blue)]/10 border-[var(--color-neon-blue)]/30'}
+                    `}
+                  >
+                    <Cpu size={16} className={`mt-0.5 flex-shrink-0
+                      ${insight.type === 'warning' ? 'text-yellow-400' : 
+                        insight.type === 'success' ? 'text-[var(--color-neon-green)]' :
+                        'text-[var(--color-neon-blue)]'}
+                    `} />
+                    <p className="text-sm text-gray-200">{insight.text}</p>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
             </div>
           </div>
           
