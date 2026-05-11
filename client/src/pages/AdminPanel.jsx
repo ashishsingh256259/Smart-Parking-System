@@ -213,6 +213,54 @@ const AdminPanel = () => {
           </ResponsiveContainer>
         </div>
       </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 relative z-10 mt-8">
+        <div className="glass-panel p-6 rounded-3xl border border-red-500/30">
+          <h3 className="text-xl font-bold mb-6 flex items-center gap-2 text-red-400">
+            <Activity className="text-red-500 animate-pulse" /> Emergency Alerts
+          </h3>
+          <div className="space-y-4">
+            <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-start gap-4">
+              <div className="w-2 h-2 bg-red-500 rounded-full mt-2 animate-ping"></div>
+              <div>
+                <p className="text-white font-bold">Unauthorized Vehicle Detected</p>
+                <p className="text-sm text-gray-400">Gate C - Zone 2. Security notified.</p>
+                <p className="text-xs text-red-400 mt-1">2 mins ago</p>
+              </div>
+            </div>
+            <div className="p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-xl flex items-start gap-4">
+              <div className="w-2 h-2 bg-yellow-500 rounded-full mt-2"></div>
+              <div>
+                <p className="text-white font-bold">Sensor Node Offline</p>
+                <p className="text-sm text-gray-400">Node B4 lost connection. Attempting reboot.</p>
+                <p className="text-xs text-yellow-400 mt-1">15 mins ago</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="glass-panel p-6 rounded-3xl border border-gray-800/50">
+          <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
+            <Users className="text-blue-400" /> Active Users
+          </h3>
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="flex justify-between items-center p-3 hover:bg-white/5 rounded-xl transition-colors cursor-pointer border border-transparent hover:border-gray-700">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold">
+                    U{i}
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-white">User_{Math.floor(Math.random() * 1000)}</p>
+                    <p className="text-xs text-gray-500">Navigating to Zone {i}</p>
+                  </div>
+                </div>
+                <div className="text-xs px-2 py-1 bg-green-500/20 text-green-400 rounded">Active</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

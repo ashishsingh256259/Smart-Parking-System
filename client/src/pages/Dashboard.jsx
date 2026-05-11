@@ -10,7 +10,7 @@ const Dashboard = () => {
   const [slots, setSlots] = useState([]);
   const [loading, setLoading] = useState(true);
   const [logs, setLogs] = useState([]);
-  const [autoFindSlot, setAutoFindSlot] = useState(null);
+  const [autoNavigateTarget, setAutoNavigateTarget] = useState(null);
   
   const [stats, setStats] = useState({
     total: 0,
@@ -134,11 +134,10 @@ const Dashboard = () => {
 
     addLog(`AI recommended ${bestSlot.slotId} (${bestSlot.predictionPercentage}% confidence)`, 'success');
     
-    // Instead of passing forceNavigate directly, we can just highlight it via toast, and the user can click it
-    // In a fully integrated version, we would pass autoFindSlot to InteractiveMap to trigger handleSlotClick automatically.
-    toast.success(`AI Found Best Slot: ${bestSlot.slotId}! Click it to navigate.`, {
+    setAutoNavigateTarget(bestSlot);
+    toast.success(`AI Navigating to Best Slot: ${bestSlot.slotId}...`, {
       icon: '🧠',
-      duration: 5000,
+      duration: 4000,
       style: { background: 'rgba(57, 255, 20, 0.1)', border: '1px solid #39ff14' }
     });
   };
@@ -253,7 +252,7 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 relative z-10">
         <div className="lg:col-span-2 flex flex-col">
           {slots.length > 0 ? (
-            <InteractiveMap slots={slots} onSlotClick={handleSlotClick} />
+            <InteractiveMap slots={slots} onSlotClick={handleSlotClick} autoNavigateTarget={autoNavigateTarget} />
           ) : (
             <div className="glass-panel p-12 rounded-3xl flex flex-col items-center justify-center text-center h-full border-dashed border-2 border-gray-700/50 backdrop-blur-md">
               <div className="p-6 bg-gray-900/50 rounded-full mb-6">

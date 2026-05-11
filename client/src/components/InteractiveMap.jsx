@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { aStar } from '../algorithms/aStar';
 import { Car, MapPin, Zap, Info } from 'lucide-react';
 
-const InteractiveMap = ({ slots, onSlotClick }) => {
+const InteractiveMap = ({ slots, onSlotClick, autoNavigateTarget }) => {
   const [path, setPath] = useState([]);
   const [visited, setVisited] = useState([]);
   const [targetSlot, setTargetSlot] = useState(null);
@@ -17,9 +17,15 @@ const InteractiveMap = ({ slots, onSlotClick }) => {
   const GRID_HEIGHT = 5;
   const ENTRY_GATE = { x: 0, y: 0 }; 
 
-  const handleSlotClick = (slot) => {
-    if (isAnimating || slot.status !== 'available') {
-      onSlotClick(slot);
+  useEffect(() => {
+    if (autoNavigateTarget) {
+      setTimeout(() => handleSlotClick(autoNavigateTarget, true), 100);
+    }
+  }, [autoNavigateTarget]);
+
+  const handleSlotClick = (slot, force = false) => {
+    if ((isAnimating && !force) || slot.status !== 'available') {
+      if (!force) onSlotClick(slot);
       return;
     }
     
@@ -126,8 +132,10 @@ const InteractiveMap = ({ slots, onSlotClick }) => {
               if (road) {
                 // Road styling
                 content = (
-                  <div className="w-full h-full flex flex-col items-center justify-center opacity-30">
-                     <div className="w-1 h-full border-l-2 border-dashed border-gray-500"></div>
+                  <div className="w-full h-full flex flex-col items-center justify-center opacity-60">
+                     <div className="text-gray-600 mb-1 font-bold text-xs">↑</div>
+                     <div className="w-1 h-full border-l-[3px] border-dashed border-yellow-500/40"></div>
+                     <div className="text-gray-600 mt-1 font-bold text-xs">↓</div>
                   </div>
                 );
               } else if (slot) {
@@ -180,12 +188,12 @@ const InteractiveMap = ({ slots, onSlotClick }) => {
 
               // Pathfinding visuals
               if (inPath) {
-                bgColor = "bg-[var(--color-neon-blue)]/30";
+                bgColor = "bg-[var(--color-neon-blue)]/40";
                 borderColor = "border-[var(--color-neon-blue)]";
-                shadow = "shadow-[0_0_25px_var(--color-neon-blue)]";
+                shadow = "shadow-[0_0_30px_var(--color-neon-blue)]";
               } else if (isExplored) {
-                bgColor = "bg-purple-500/10";
-                borderColor = "border-purple-500/30";
+                bgColor = "bg-[var(--color-neon-blue)]/15";
+                borderColor = "border-[var(--color-neon-blue)]/40";
               }
 
               return (
@@ -199,10 +207,32 @@ const InteractiveMap = ({ slots, onSlotClick }) => {
                     cursor-pointer transition-colors duration-300 relative backdrop-blur-sm
                     ${bgColor} ${borderColor} ${shadow}
                     ${!slot && !road ? 'opacity-0 pointer-events-none' : ''}
+                    ${road ? '!rounded-none !border-y-0 !border-x-[1px] !border-gray-800 bg-[#0c0c12]' : ''}
                   `}
                 >
                   {content}
                   
+                  {/* Destination Pulsing */}
+                  {targetSlot && targetSlot.x === x && targetSlot.y === y && isAnimating && (
+                    <motion.div 
+                      className="absolute inset-0 border-[3px] border-[var(--color-neon-green)] rounded-xl z-20 pointer-events-none"
+                      animate={{ scale: [1, 1.15, 1], opacity: [0.4, 1, 0.4] }}
+                      transition={{ duration: 1.5, repeat: Infinity }}
+                    />
+                  )}
+
+                  {/* Car Animation on Path */}
+                  {inPath && path[path.length - 1].x === x && path[path.length - 1].y === y && (
+                    <motion.div 
+                      layoutId="navigationCar"
+                      initial={{ scale: 0.5, opacity: 0 }}
+                      animate={{ scale: 1.2, opacity: 1 }}
+                      className="absolute z-30 pointer-events-none"
+                    >
+                      <Car size={40} className="text-[var(--color-neon-blue)] drop-shadow-[0_0_20px_rgba(0,243,255,1)]" />
+                    </motion.div>
+                  )}
+
                   {/* Path connection effect */}
                   {inPath && (
                     <motion.div 
