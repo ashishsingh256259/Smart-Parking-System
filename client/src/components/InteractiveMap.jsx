@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { aStar } from '../algorithms/aStar';
 import { Car, MapPin, Zap, Info } from 'lucide-react';
@@ -181,7 +181,7 @@ const InteractiveMap = ({ slots, onSlotClick, autoNavigateTarget, surgeMultiplie
                     <span className="font-extrabold text-xl z-10">{slot.slotId}</span>
                     {slot.status === 'available' && (
                        <span className={`text-[10px] font-mono mt-0.5 font-bold z-10 ${surgeMultiplier > 1.0 ? 'text-yellow-400 animate-pulse' : 'text-green-500'}`}>
-                          ${(5.0 * surgeMultiplier).toFixed(2)}
+                          ₹{(50.0 * surgeMultiplier).toFixed(2)}
                        </span>
                     )}
                     {slot.type === 'ev' && <Zap size={14} className="text-blue-400 absolute bottom-2 right-2 drop-shadow-[0_0_5px_rgba(96,165,250,0.8)]" />}
@@ -325,3 +325,4 @@ const InteractiveMap = ({ slots, onSlotClick, autoNavigateTarget, surgeMultiplie
 };
 
 export default InteractiveMap;
+

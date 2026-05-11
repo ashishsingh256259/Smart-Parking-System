@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 const AdminPanel = () => {
   const [analytics, setAnalytics] = useState(null);
   const [uptime, setUptime] = useState(99.98);
+  const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
     const fetchAnalytics = async () => {
@@ -20,10 +21,10 @@ const AdminPanel = () => {
     };
     fetchAnalytics();
     
-    // Simulate slight uptime fluctuations
     const interval = setInterval(() => {
       setUptime(prev => +(prev + (Math.random() > 0.5 ? 0.01 : -0.01)).toFixed(2));
-    }, 10000);
+      setCurrentTime(new Date());
+    }, 1000);
     return () => clearInterval(interval);
   }, []);
 
@@ -289,7 +290,7 @@ const AdminPanel = () => {
             
             {/* Timestamp */}
             <div className="absolute bottom-4 left-4 text-green-500/80 font-mono text-[10px] z-30 bg-black/60 px-2 py-1 rounded border border-green-500/20 backdrop-blur-md">
-              DRONE_04 // SECTOR_7G // {new Date().toLocaleTimeString()}
+              DRONE_04 // SECTOR_7G // {currentTime.toLocaleTimeString()}
             </div>
           </div>
         </div>
