@@ -23,6 +23,37 @@ const Dashboard = () => {
   });
   const [time, setTime] = useState(new Date());
 
+  const playSound = (type) => {
+    try {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContext) return;
+      const audioCtx = new AudioContext();
+      const oscillator = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+      
+      if (type === 'scan') {
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(800, audioCtx.currentTime);
+        oscillator.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1);
+        gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+        oscillator.start();
+        oscillator.stop(audioCtx.currentTime + 0.3);
+      } else if (type === 'arrive') {
+        oscillator.type = 'triangle';
+        oscillator.frequency.setValueAtTime(300, audioCtx.currentTime);
+        oscillator.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.2);
+        gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+        oscillator.start();
+        oscillator.stop(audioCtx.currentTime + 0.4);
+      }
+    } catch(e) {}
+  };
+
   const addLog = (message, type = 'info') => {
     setLogs(prev => {
       const newLogs = [{ id: Date.now(), message, type, time: new Date() }, ...prev];
@@ -92,6 +123,34 @@ const Dashboard = () => {
     };
   }, []);
 
+  // Dynamic Traffic Simulation
+  useEffect(() => {
+    if (slots.length === 0) return;
+    const trafficInterval = setInterval(async () => {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      // Simulate random cars entering/leaving
+      if (Math.random() > 0.6) {
+        const availableSlots = slots.filter(s => s.status === 'available');
+        if (availableSlots.length > 0) {
+          const randomSlot = availableSlots[Math.floor(Math.random() * availableSlots.length)];
+          setAutoNavigateTarget(randomSlot);
+          addLog(`Vehicle entered Gate A. AI routing to ${randomSlot.slotId}`, 'info');
+        }
+      } else if (Math.random() > 0.7) {
+        const occupiedSlots = slots.filter(s => s.status === 'occupied');
+        if (occupiedSlots.length > 0) {
+          const randomSlot = occupiedSlots[Math.floor(Math.random() * occupiedSlots.length)];
+          try {
+            await axios.put(`${API_URL}/api/free-slot/${randomSlot.slotId}`);
+            addLog(`Vehicle exited ${randomSlot.slotId}. Sensor updated.`, 'info');
+            fetchSlots(true);
+          } catch (e) {}
+        }
+      }
+    }, 12000);
+    return () => clearInterval(trafficInterval);
+  }, [slots]);
+
   const handleSlotClick = async (slot) => {
     if (slot.status === 'reserved') {
       toast.error(`Slot ${slot.slotId} is reserved for VIP/Disabled parking.`);
@@ -133,6 +192,7 @@ const Dashboard = () => {
     })[0];
 
     addLog(`AI recommended ${bestSlot.slotId} (${bestSlot.predictionPercentage}% confidence)`, 'success');
+    playSound('scan');
     
     setAutoNavigateTarget(bestSlot);
     toast.success(`AI Navigating to Best Slot: ${bestSlot.slotId}...`, {
@@ -153,12 +213,19 @@ const Dashboard = () => {
 
   if (loading && slots.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center pt-20">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-16 h-16 border-4 border-[var(--color-neon-blue)] border-t-transparent rounded-full animate-spin shadow-[0_0_15px_var(--color-neon-blue)]"></div>
-          <span className="text-[var(--color-neon-blue)] font-mono tracking-widest animate-pulse">BOOTING AI CORE...</span>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="min-h-screen flex items-center justify-center pt-20">
+        <div className="flex flex-col items-center gap-6">
+          <div className="relative w-24 h-24">
+            <div className="absolute inset-0 border-4 border-[var(--color-neon-blue)] border-t-transparent rounded-full animate-spin shadow-[0_0_20px_var(--color-neon-blue)]"></div>
+            <div className="absolute inset-2 border-4 border-[var(--color-neon-green)] border-b-transparent rounded-full animate-[spin_1.5s_linear_infinite_reverse] shadow-[0_0_15px_var(--color-neon-green)]"></div>
+            <Cpu className="absolute inset-0 m-auto text-[var(--color-neon-blue)] animate-pulse" size={32} />
+          </div>
+          <div className="flex flex-col items-center">
+            <span className="text-[var(--color-neon-blue)] font-black text-xl tracking-widest animate-pulse">BOOTING AI CORE</span>
+            <span className="text-gray-400 text-xs font-mono tracking-widest mt-1">ESTABLISHING SENSOR UPLINK...</span>
+          </div>
         </div>
-      </div>
+      </motion.div>
     );
   }
 

@@ -111,6 +111,24 @@ const InteractiveMap = ({ slots, onSlotClick, autoNavigateTarget }) => {
           {/* Animated Background Grid Lines */}
           <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: 'linear-gradient(rgba(0,243,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,243,255,0.03) 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
 
+          {/* Ambient Traffic Simulation */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden z-0 opacity-30">
+            <motion.div 
+              className="absolute left-[30%] text-[var(--color-neon-blue)]"
+              animate={{ top: ['-20%', '120%'] }}
+              transition={{ duration: 7, repeat: Infinity, ease: "linear" }}
+            >
+              <Car size={32} className="transform rotate-180 opacity-50 blur-[1px]" />
+            </motion.div>
+            <motion.div 
+              className="absolute left-[70%] text-[var(--color-neon-green)]"
+              animate={{ top: ['120%', '-20%'] }}
+              transition={{ duration: 10, repeat: Infinity, ease: "linear", delay: 3 }}
+            >
+              <Car size={32} className="opacity-50 blur-[1px]" />
+            </motion.div>
+          </div>
+
           {/* Entry Gate */}
           <div className="absolute -top-4 -left-4 px-4 py-1.5 bg-gradient-to-r from-[var(--color-neon-blue)] to-[var(--color-neon-green)] text-black font-extrabold rounded-lg text-xs shadow-[0_0_20px_var(--color-neon-blue)] z-30 uppercase tracking-widest flex items-center gap-2">
             <div className="w-2 h-2 bg-black rounded-full animate-ping"></div>
@@ -162,11 +180,16 @@ const InteractiveMap = ({ slots, onSlotClick, autoNavigateTarget }) => {
                     {slot.status === 'available' && (
                       <div className="absolute top-2 left-2 flex flex-col items-start">
                         <span className="text-[9px] text-[var(--color-neon-green)] font-bold tracking-wider">{slot.predictionPercentage}%</span>
-                        <div className="w-8 h-1 bg-gray-800 rounded-full mt-0.5 overflow-hidden">
+                        <div className="w-8 h-1 bg-gray-800 rounded-full mt-0.5 overflow-hidden relative">
                           <motion.div 
                             initial={{ width: 0 }}
                             animate={{ width: `${slot.predictionPercentage}%` }}
                             className="h-full bg-[var(--color-neon-green)] shadow-[0_0_5px_var(--color-neon-green)]"
+                          />
+                          <motion.div 
+                            className="absolute top-0 bottom-0 w-3 bg-white/70 blur-[2px]"
+                            animate={{ left: ['-50%', '150%'] }}
+                            transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
                           />
                         </div>
                       </div>
