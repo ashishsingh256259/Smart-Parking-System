@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend, LineChart, Line } from 'recharts';
-import { Zap, TrendingUp, Users, Clock, Activity, AlertTriangle } from 'lucide-react';
+import { Zap, TrendingUp, Users, Clock, Activity, AlertTriangle, Video, Crosshair } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const AdminPanel = () => {
@@ -243,25 +243,54 @@ const AdminPanel = () => {
           </div>
         </div>
 
-        <div className="glass-panel p-6 rounded-3xl border border-gray-800/50">
-          <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-            <Users className="text-blue-400" /> Active Users
+        <div className="glass-panel p-6 rounded-3xl border border-gray-800/50 relative overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-green-900/5 via-transparent to-transparent pointer-events-none"></div>
+          <h3 className="text-xl font-bold mb-6 flex items-center gap-2 relative z-10">
+            <Video className="text-green-400 animate-pulse" /> Live Security Feed
           </h3>
-          <div className="space-y-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="flex justify-between items-center p-3 hover:bg-white/5 rounded-xl transition-colors cursor-pointer border border-transparent hover:border-gray-700">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold">
-                    U{i}
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold text-white">User_{Math.floor(Math.random() * 1000)}</p>
-                    <p className="text-xs text-gray-500">Navigating to Zone {i}</p>
-                  </div>
-                </div>
-                <div className="text-xs px-2 py-1 bg-green-500/20 text-green-400 rounded">Active</div>
-              </div>
-            ))}
+          <div className="w-full h-56 bg-[#0a0a0f] rounded-2xl border border-gray-800 relative overflow-hidden group cursor-crosshair shadow-[inset_0_0_20px_rgba(0,0,0,0.8)]">
+            {/* Scanline Effect */}
+            <motion.div 
+              className="absolute left-0 right-0 h-2 bg-green-500/20 blur-[2px] z-20 pointer-events-none"
+              animate={{ top: ['-10%', '110%'] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+            />
+            {/* Static overlay grid */}
+            <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'linear-gradient(rgba(0,255,0,0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,0,0.2) 1px, transparent 1px)', backgroundSize: '30px 30px' }}></div>
+            
+            {/* Crosshair */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-30 group-hover:opacity-100 transition-opacity duration-500">
+              <Crosshair size={64} className="text-green-500/50" />
+            </div>
+
+            {/* AI Bounding Box Mock 1 */}
+            <motion.div 
+              className="absolute top-1/4 left-1/4 w-32 h-20 border-2 border-green-500/60 bg-green-500/5 z-10 flex flex-col justify-end pointer-events-none"
+              animate={{ x: [0, 50, -30, 0], y: [0, -20, 20, 0] }}
+              transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <div className="bg-green-500 text-black text-[9px] font-bold px-1.5 w-max">VEHICLE: 99%</div>
+            </motion.div>
+            
+            {/* AI Bounding Box Mock 2 */}
+            <motion.div 
+              className="absolute top-1/2 right-1/4 w-16 h-28 border-2 border-yellow-500/60 bg-yellow-500/5 z-10 flex flex-col justify-end pointer-events-none"
+              animate={{ x: [0, -40, 30, 0], y: [0, 30, -20, 0] }}
+              transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <div className="bg-yellow-500 text-black text-[9px] font-bold px-1.5 w-max">HUMAN: 87%</div>
+            </motion.div>
+
+            {/* Rec indicator */}
+            <div className="absolute top-4 right-4 flex items-center gap-2 z-30 bg-black/40 px-2 py-1 rounded">
+              <div className="w-2.5 h-2.5 bg-red-500 rounded-full animate-ping"></div>
+              <span className="text-red-500 text-xs font-black tracking-widest uppercase">REC</span>
+            </div>
+            
+            {/* Timestamp */}
+            <div className="absolute bottom-4 left-4 text-green-500/80 font-mono text-[10px] z-30 bg-black/60 px-2 py-1 rounded border border-green-500/20 backdrop-blur-md">
+              DRONE_04 // SECTOR_7G // {new Date().toLocaleTimeString()}
+            </div>
           </div>
         </div>
       </div>
