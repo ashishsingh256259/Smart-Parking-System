@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { aStar } from '../algorithms/aStar';
 import { Car, MapPin, Zap, Info } from 'lucide-react';
 
-const InteractiveMap = ({ slots, onSlotClick, autoNavigateTarget }) => {
+const InteractiveMap = ({ slots, onSlotClick, autoNavigateTarget, surgeMultiplier = 1.0 }) => {
   const [path, setPath] = useState([]);
   const [visited, setVisited] = useState([]);
   const [targetSlot, setTargetSlot] = useState(null);
@@ -163,9 +163,10 @@ const InteractiveMap = ({ slots, onSlotClick, autoNavigateTarget }) => {
                 );
               } else if (slot) {
                 if (slot.status === 'available') {
-                  bgColor = "bg-[var(--color-neon-green)]/5 hover:bg-[var(--color-neon-green)]/20";
-                  borderColor = "border-[var(--color-neon-green)]/40 hover:border-[var(--color-neon-green)]";
-                  shadow = "hover:shadow-[0_0_20px_rgba(57,255,20,0.4)]";
+                  const isSurging = surgeMultiplier > 1.0;
+                  bgColor = isSurging ? "bg-yellow-400/10 hover:bg-yellow-400/20" : "bg-[var(--color-neon-green)]/5 hover:bg-[var(--color-neon-green)]/20";
+                  borderColor = isSurging ? "border-yellow-400/50 hover:border-yellow-400" : "border-[var(--color-neon-green)]/40 hover:border-[var(--color-neon-green)]";
+                  shadow = isSurging ? "hover:shadow-[0_0_20px_rgba(250,204,21,0.4)] shadow-[inset_0_0_10px_rgba(250,204,21,0.2)]" : "hover:shadow-[0_0_20px_rgba(57,255,20,0.4)]";
                 } else if (slot.status === 'occupied') {
                   bgColor = "bg-red-500/10 hover:bg-red-500/30";
                   borderColor = "border-red-500/40 hover:border-red-400";
@@ -178,6 +179,11 @@ const InteractiveMap = ({ slots, onSlotClick, autoNavigateTarget }) => {
                 content = (
                   <>
                     <span className="font-extrabold text-xl z-10">{slot.slotId}</span>
+                    {slot.status === 'available' && (
+                       <span className={`text-[10px] font-mono mt-0.5 font-bold z-10 ${surgeMultiplier > 1.0 ? 'text-yellow-400 animate-pulse' : 'text-green-500'}`}>
+                          ${(5.0 * surgeMultiplier).toFixed(2)}
+                       </span>
+                    )}
                     {slot.type === 'ev' && <Zap size={14} className="text-blue-400 absolute bottom-2 right-2 drop-shadow-[0_0_5px_rgba(96,165,250,0.8)]" />}
                     {slot.type === 'disabled' && <span className="text-xs text-blue-400 absolute bottom-2 right-2">♿</span>}
                     

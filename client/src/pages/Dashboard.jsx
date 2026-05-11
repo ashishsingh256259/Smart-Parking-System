@@ -27,6 +27,7 @@ const Dashboard = () => {
     avgConfidence: 0,
     waitTime: '2 mins'
   });
+  const [currentSurge, setCurrentSurge] = useState(1.0);
   const [time, setTime] = useState(new Date());
 
   const playSound = (type) => {
@@ -94,15 +95,19 @@ const Dashboard = () => {
       const confidences = data.filter(s => s.status === 'available').map(s => s.predictionPercentage);
       const avgConf = confidences.length ? Math.round(confidences.reduce((a, b) => a + b, 0) / confidences.length) : 0;
       
+      const occRate = total ? Math.round(((occupied + reserved) / total) * 100) : 0;
+      
       setStats({
         total,
         available,
         occupied,
         reserved,
-        occupancyRate: total ? Math.round(((occupied + reserved) / total) * 100) : 0,
+        occupancyRate: occRate,
         avgConfidence: avgConf,
         waitTime: available > 5 ? '1 min' : (available > 0 ? '3 mins' : '15+ mins')
       });
+      
+      setCurrentSurge(occRate > 70 ? 2.5 : occRate > 40 ? 1.5 : 1.0);
       
       if (!isBackground && data.length > 0) {
         addLog('AI Grid Synced with Sensors', 'info');
@@ -342,14 +347,17 @@ const Dashboard = () => {
           <div className="text-5xl font-black text-white tracking-tighter">{stats.avgConfidence}%</div>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="glass-panel p-6 rounded-3xl border-b-2 border-b-yellow-400 hover:-translate-y-1 transition-transform group">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className={`glass-panel p-6 rounded-3xl border-b-2 hover:-translate-y-1 transition-transform group ${currentSurge > 1.0 ? 'border-b-yellow-400' : 'border-b-[var(--color-neon-blue)]'}`}>
           <div className="flex justify-between items-start mb-4">
-            <h3 className="text-gray-400 font-medium">Est. Wait Time</h3>
-            <div className="p-2 bg-yellow-400/10 rounded-lg group-hover:bg-yellow-400/20 transition-colors">
-              <Clock className="text-yellow-400" size={20} />
+            <h3 className="text-gray-400 font-medium">Surge Multiplier</h3>
+            <div className={`p-2 rounded-lg transition-colors ${currentSurge > 1.0 ? 'bg-yellow-400/10 group-hover:bg-yellow-400/20' : 'bg-[var(--color-neon-blue)]/10 group-hover:bg-[var(--color-neon-blue)]/20'}`}>
+              <Zap className={currentSurge > 1.0 ? 'text-yellow-400' : 'text-[var(--color-neon-blue)]'} size={20} />
             </div>
           </div>
-          <div className="text-5xl font-black text-white tracking-tighter">{stats.waitTime}</div>
+          <div className="text-5xl font-black text-white tracking-tighter flex items-end gap-2">
+            {currentSurge}x
+            <span className="text-sm text-gray-500 font-normal mb-1">Live Price</span>
+          </div>
         </motion.div>
       </div>
 
@@ -378,7 +386,7 @@ const Dashboard = () => {
             </div>
           )}
           {slots.length > 0 ? (
-            <InteractiveMap slots={slots} onSlotClick={handleSlotClick} autoNavigateTarget={autoNavigateTarget} />
+            <InteractiveMap slots={slots} onSlotClick={handleSlotClick} autoNavigateTarget={autoNavigateTarget} surgeMultiplier={currentSurge} />
           ) : (
             <div className="glass-panel p-12 rounded-3xl flex flex-col items-center justify-center text-center h-full border-dashed border-2 border-gray-700/50 backdrop-blur-md">
               <div className="p-6 bg-gray-900/50 rounded-full mb-6">
