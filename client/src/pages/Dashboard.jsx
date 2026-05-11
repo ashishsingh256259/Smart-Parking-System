@@ -388,6 +388,7 @@ const Dashboard = () => {
                 {stats.occupancyRate > 80 ? "High congestion detected. Routing vehicles to alternate zones." : "Optimal traffic flow. Average fuel savings: 12%."}
               </p>
             </div>
+          </div>
           {/* AI Insights Panel */}
           <div className="glass-panel p-6 rounded-3xl border-purple-500/20 bg-gradient-to-br from-[rgba(20,20,30,0.9)] to-purple-900/10">
             <h3 className="text-lg font-bold mb-4 flex items-center gap-2 border-b border-gray-800 pb-3">
